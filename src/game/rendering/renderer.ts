@@ -5,6 +5,7 @@ import { createShader, createProgram } from "../../core/shaders"
 import vertexSource from './shaders/triangle.vert?raw'
 import fragmentSource from './shaders/triangle.frag?raw'
 import type { GameState } from "../gameState"
+import type { Camera } from "./camera"
 
 export class Renderer {
     private canvas: HTMLCanvasElement
@@ -18,6 +19,9 @@ export class Renderer {
     private angleLocation: WebGLUniformLocation | null
     private positionLocation: number
     private colorLocation: number
+    private cameraPositionLocation: WebGLUniformLocation | null
+    private cameraZoomLocation: WebGLUniformLocation | null
+    private viewportSizeLocation: WebGLUniformLocation | null
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas
@@ -49,11 +53,17 @@ export class Renderer {
         this.vbo = buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
 
+        // const vertices = new Float32Array([
+        // //   x      y      r    g    b
+        //     0.0,   0.6,   1.0, 0.0, 0.0,
+        //    -0.52, -0.3,   0.0, 1.0, 0.0,
+        //     0.52, -0.3,   0.0, 0.0, 1.0,
+        // ])
         const vertices = new Float32Array([
         //   x      y      r    g    b
-            0.0,   0.6,   1.0, 0.0, 0.0,
-           -0.52, -0.3,   0.0, 1.0, 0.0,
-            0.52, -0.3,   0.0, 0.0, 1.0,
+            0.0,  60.0,   1.0, 0.0, 0.0,
+          -52.0, -30.0,   0.0, 1.0, 0.0,
+           52.0, -30.0,   0.0, 0.0, 1.0,
         ])
 
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
@@ -97,6 +107,9 @@ export class Renderer {
         this.angleLocation = gl.getUniformLocation(this.program, 'u_angle')
         this.positionLocation = gl.getAttribLocation(this.program, 'a_position')
         this.colorLocation = gl.getAttribLocation(this.program, 'a_color')
+        this.cameraPositionLocation = gl.getUniformLocation(this.program, 'u_camera_position')
+        this.cameraZoomLocation = gl.getUniformLocation(this.program, 'u_camera_zoom')
+        this.viewportSizeLocation = gl.getUniformLocation(this.program, 'u_viewport_size')
 
         this.resize();
     }
@@ -115,7 +128,7 @@ export class Renderer {
         )
     }
 
-    render(state: GameState) {
+    render = (camera: Camera, state: GameState) => {
         const gl = this.gl
 
         gl.clearColor(0.02, 0.02, 0.04, 1.0)
@@ -125,12 +138,16 @@ export class Renderer {
         gl.bindVertexArray(this.vao)
 
         gl.uniform1f(this.angleLocation, state.angle)
+        gl.uniform1f(this.cameraZoomLocation, camera.zoom)
+        gl.uniform2f(this.cameraPositionLocation, camera.position.x, camera.position.y)
+        gl.uniform2f(this.viewportSizeLocation, this.canvas.width, this.canvas.height)
+
         gl.drawArrays(gl.TRIANGLES, 0, 3)
 
         gl.bindVertexArray(null)
     }
 
-    destroy() {
+    destroy = () => {
         this.gl.deleteVertexArray(this.vao)
         this.gl.deleteBuffer(this.vbo)
         this.gl.deleteProgram(this.program)

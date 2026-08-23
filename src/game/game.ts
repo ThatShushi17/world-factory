@@ -2,10 +2,12 @@ import type { GameState } from "./gameState";
 import { Renderer } from "./rendering/renderer";
 import { Simulation } from "./simulation/simulation";
 import { Input, type InputData } from "./input";
+import { Camera } from "./rendering/camera";
 
 export class Game {
     private renderer: Renderer
     private simulation: Simulation = new Simulation()
+    private camera: Camera = new Camera
     private input: Input = new Input()
     private state: GameState = {
         time: 0,
@@ -23,7 +25,7 @@ export class Game {
         window.addEventListener('resize', this.renderer.resize)
     }
 
-    start() {
+    start = () => {
         const tick = (time: number) => {
             this.dt = (time - this.lastTime) / 1000
             this.lastTime = time
@@ -37,13 +39,14 @@ export class Game {
         this.animationFrame = requestAnimationFrame(tick)
     }
 
-    private tick(dt: number) {
+    private tick = (dt: number) => {
         this.simulation.tick(dt, this.input.getData(), this.state)
-        this.renderer.render(this.state)
+        this.camera.update(dt, this.input.getData())
+        this.renderer.render(this.camera, this.state)
         this.input.clear()
     }
 
-    destroy() {
+    destroy = () => {
         cancelAnimationFrame(this.animationFrame)
 
         this.renderer.destroy()

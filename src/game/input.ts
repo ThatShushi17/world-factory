@@ -35,9 +35,9 @@ export class Input {
         window.addEventListener('mouseup', this.onMouseUp)
     }
 
-    getData(): InputData { return this.data }
+    getData = (): InputData => { return this.data }
 
-    clear(): void {
+    clear = (): void => {
         this.data.mouseDeltaX = 0
         this.data.mouseDeltaY = 0
 
@@ -47,7 +47,7 @@ export class Input {
         this.data.releasedMouseButtons.clear()
     }
 
-    destroy(): void {
+    destroy = (): void => {
         window.removeEventListener('keydown', this.onKeyDown)
         window.removeEventListener('keyup', this.onKeyUp)
         window.removeEventListener('mousemove', this.onMouseMove)
