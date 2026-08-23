@@ -101,7 +101,7 @@ export class Renderer {
         this.resize();
     }
 
-    resize() {
+    resize = () => {
         const dpr = window.devicePixelRatio
 
         this.canvas.width = this.canvas.clientWidth * dpr

@@ -1,10 +1,12 @@
 import type { GameState } from "./gameState";
 import { Renderer } from "./rendering/renderer";
 import { Simulation } from "./simulation/simulation";
+import { Input, type InputData } from "./input";
 
 export class Game {
     private renderer: Renderer
     private simulation: Simulation = new Simulation()
+    private input: Input = new Input()
     private state: GameState = {
         time: 0,
         angle: 0
@@ -36,8 +38,9 @@ export class Game {
     }
 
     private tick(dt: number) {
-        this.simulation.tick(dt, this.state)
+        this.simulation.tick(dt, this.input.getData(), this.state)
         this.renderer.render(this.state)
+        this.input.clear()
     }
 
     destroy() {
