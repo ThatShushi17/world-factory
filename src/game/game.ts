@@ -22,6 +22,7 @@ export class Game {
 
     constructor(canvas: HTMLCanvasElement) {
         this.renderer = new Renderer(canvas)
+        this.simulation.camera.setViewport(canvas.clientWidth, canvas.clientHeight)
         window.addEventListener('resize', this.renderer.resize)
     }
 
@@ -40,8 +41,8 @@ export class Game {
     }
 
     private tick = (dt: number) => {
-        let rect = this.simulation.tick(dt, this.input.getData(), this.state)
-        this.renderer.render(rect, this.simulation.camera)
+        let renderData = this.simulation.tick(dt, this.input.getData(), this.state)
+        this.renderer.render(renderData, this.simulation.camera)
         this.input.clear()
     }
 

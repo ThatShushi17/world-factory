@@ -4,7 +4,11 @@ import type { InputData } from "../input"
 export class Camera {
     position: Position = { x: 0, y: 0}
     target: Position = { x: 0, y: 0 }
+    offset: Position = { x: 0, y: 0 }
     translateSpeed = 6
+
+    mouseLookForward = 50
+    mouseDownMultiplier = 3
 
     zoom = 1
     zoomSpeed = 0.01
@@ -12,13 +16,26 @@ export class Camera {
     viewportWidth = 1
     viewportHeight = 1
 
-    update = (dt: number) => {  // TODO: add look-forward with mouse, shift
+    update = (dt: number) => {
         this.moveTowardsTarget(dt)
     }
 
     setTarget = (target: Position): void => {
         this.target.x = target.x
         this.target.y = target.y
+    }
+
+    setMouseOffset = (mousePosition: Position, isMouseDown: boolean): void => {
+        const dx = mousePosition.x - this.viewportWidth / 2
+        const dy = mousePosition.y - this.viewportHeight / 2
+
+        const nx = 2 * dx / this.viewportWidth  // dx / (this.viewportWidth / 2)
+        const ny = 2 * dy / this.viewportHeight
+
+        const mult = isMouseDown ? this.mouseDownMultiplier : 1
+
+        this.offset.x = nx * this.mouseLookForward * mult
+        this.offset.y = ny * this.mouseLookForward * mult
     }
 
     setViewport = (width: number, height: number): void => {
@@ -40,9 +57,10 @@ export class Camera {
         }
     }
 
-    private moveTowardsTarget = (dt: number): void => {
-        this.position.x += (this.target.x - this.position.x) * Math.min(this.translateSpeed * dt, 1)
-        this.position.y += (this.target.y - this.position.y) * Math.min(this.translateSpeed * dt, 1)
+    moveTowardsTarget = (dt: number): void => {
+        const target: Position = { x: this.target.x + this.offset.x, y: this.target.y + this.offset.y }
+        this.position.x += (target.x - this.position.x) * Math.min(this.translateSpeed * dt, 1)
+        this.position.y += (target.y - this.position.y) * Math.min(this.translateSpeed * dt, 1)
     }
 
     // TODO: add a clampToWorldSize() to prevent out of bounds rendering

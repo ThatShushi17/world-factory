@@ -5,7 +5,8 @@ import { createShader, createProgram } from "../../core/shaders"
 import vertexSource from './shaders/sprite.vert?raw'
 import fragmentSource from './shaders/sprite.frag?raw'
 import type { Camera } from "./camera"
-import type { Position, Rect, Size } from "../../core/types"
+import type { Rect } from "../../core/types"
+import type { RenderData } from "./renderData"
 
 export class Renderer {
     private canvas: HTMLCanvasElement
@@ -158,7 +159,7 @@ export class Renderer {
         )
     }
 
-    render = (rect: Rect, camera: Camera) => {
+    render = (renderData: RenderData, camera: Camera) => {
         const gl = this.gl
 
         gl.clearColor(0.02, 0.02, 0.04, 1.0)
@@ -172,11 +173,8 @@ export class Renderer {
         gl.uniform2f(this.cameraPositionLocation, camera.position.x, camera.position.y)
         gl.uniform2f(this.viewportSizeLocation, this.canvas.width, this.canvas.height)
 
-        const pos: Position = { x: 100, y: 300 }
-        const size: Size = { width: 100, height: 300 }
-
-        this.renderRect(rect, camera)
-        this.renderRect({ position: pos, size: size }, camera)
+        this.renderRect(renderData.playerRect, camera)
+        renderData.worldRects.forEach(rect => this.renderRect(rect, camera))
 
         gl.bindVertexArray(null)
     }

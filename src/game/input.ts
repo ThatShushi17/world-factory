@@ -1,8 +1,9 @@
+import type { Position } from "../core/types"
+
 export interface InputData {
     keys: Set<string>
 
-    mouseX: number
-    mouseY: number
+    mousePosition: Position
     mouseDeltaX: number
     mouseDeltaY: number
     mouseButtons: Set<number>
@@ -16,8 +17,7 @@ export interface InputData {
 export class Input {
     private data: InputData = {
         keys: new Set(),
-        mouseX: 0,
-        mouseY: 0,
+        mousePosition: { x: 0, y: 0 },
         mouseDeltaX: 0,
         mouseDeltaY: 0,
         mouseButtons: new Set(),
@@ -69,8 +69,7 @@ export class Input {
     }
 
     private onMouseMove = (e: MouseEvent): void => {
-        this.data.mouseX = e.clientX
-        this.data.mouseY = e.clientY
+        this.data.mousePosition = { x: e.clientX, y: e.clientY }
         
         this.data.mouseDeltaX += e.movementX
         this.data.mouseDeltaY += e.movementY
