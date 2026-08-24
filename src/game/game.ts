@@ -1,14 +1,14 @@
 import type { GameState } from "./gameState";
 import { Renderer } from "./rendering/renderer";
 import { Simulation } from "./simulation/simulation";
-import { Input, type InputData } from "./input";
-import { Camera } from "./rendering/camera";
+import { Input } from "./input";
 
 export class Game {
     private renderer: Renderer
-    private simulation: Simulation = new Simulation()
-    private camera: Camera = new Camera
-    private input: Input = new Input()
+
+    private simulation = new Simulation()
+    private input = new Input()
+    
     private state: GameState = {
         time: 0,
         angle: 0
@@ -26,7 +26,7 @@ export class Game {
     }
 
     start = () => {
-        const tick = (time: number) => {
+        const tick = (time: number) => {  // STUB: shouldnt need these?
             this.dt = (time - this.lastTime) / 1000
             this.lastTime = time
             this.fps = this.dt > 0 ? 1 / this.dt : 0
@@ -40,9 +40,8 @@ export class Game {
     }
 
     private tick = (dt: number) => {
-        this.simulation.tick(dt, this.input.getData(), this.state)
-        this.camera.update(dt, this.input.getData())
-        this.renderer.render(this.camera, this.state)
+        let rect = this.simulation.tick(dt, this.input.getData(), this.state)
+        this.renderer.render(rect, this.simulation.camera)
         this.input.clear()
     }
 

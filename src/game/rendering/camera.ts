@@ -3,7 +3,7 @@ import type { InputData } from "../input"
 
 export class Camera {
     position: Position = { x: 0, y: 0}
-    target: Position = { x: 0, y: 0 }  // STUB: change to relative position
+    target: Position = { x: 0, y: 0 }
     translateSpeed = 6
 
     zoom = 1
@@ -12,28 +12,13 @@ export class Camera {
     viewportWidth = 1
     viewportHeight = 1
 
-    update = (dt: number, input: InputData) => {  // TODO: remove wasd, add look-forward with mouse, shift
-        const speed = 2000  // STUB: change to player
-        
-        let x = 0
-        let y = 0
+    update = (dt: number) => {  // TODO: add look-forward with mouse, shift
+        this.moveTowardsTarget(dt)
+    }
 
-        if (input.keys.has('KeyA')) x -= 1
-        if (input.keys.has('KeyD')) x += 1
-        if (input.keys.has('KeyW')) y -= 1
-        if (input.keys.has('KeyS')) y += 1
-
-        if (x !== 0 || y !== 0) {
-            const len = Math.hypot(x, y)
-
-            x /= len
-            y /= len
-
-            this.target.x = x * speed * dt
-            this.target.y = y * speed * dt
-
-            this.moveTowardsTarget(dt)
-        }
+    setTarget = (target: Position): void => {
+        this.target.x = target.x
+        this.target.y = target.y
     }
 
     setViewport = (width: number, height: number): void => {
@@ -56,8 +41,8 @@ export class Camera {
     }
 
     private moveTowardsTarget = (dt: number): void => {
-        this.position.x += this.target.x * Math.min(this.translateSpeed * dt, 1)
-        this.position.y += this.target.y * Math.min(this.translateSpeed * dt, 1)
+        this.position.x += (this.target.x - this.position.x) * Math.min(this.translateSpeed * dt, 1)
+        this.position.y += (this.target.y - this.position.y) * Math.min(this.translateSpeed * dt, 1)
     }
 
     // TODO: add a clampToWorldSize() to prevent out of bounds rendering

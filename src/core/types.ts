@@ -12,3 +12,8 @@ export interface Size {
     width: number
     height: number
 }
+
+export interface Rect {
+    position: Position
+    size: Size
+}
